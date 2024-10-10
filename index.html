@@ -1,21 +1,9 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Unit Converter & 10% Calculator</title>
     <style>
-        :root {
-            --background-color: #444;
-            --text-color: #fff;
-            --border-color: #ccc;
-            --primary-color: #4CAF50;
-            --success-color: #28a745;
-            --error-color: #dc3545;
-            --container-padding: 20px;
-            --border-radius: 8px;
-        }
-
         body {
             font-family: Arial, sans-serif;
             display: flex;
@@ -23,15 +11,15 @@
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: var(--background-color);
-            color: var(--text-color);
+            background-color: #333;
+            color: white;
             transition: background-color 0.3s, color 0.3s;
         }
 
         .container {
-            background-color: var(--background-color);
-            padding: var(--container-padding);
-            border-radius: var(--border-radius);
+            background-color: #444;
+            padding: 20px;
+            border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             max-width: 500px;
             width: 100%;
@@ -40,14 +28,14 @@
 
         h2 {
             text-align: center;
-            color: var(--text-color);
+            color: #fff;
         }
 
         label {
             display: block;
             margin-top: 10px;
             font-weight: bold;
-            color: var(--text-color);
+            color: #fff;
         }
 
         input[type="number"], select {
@@ -56,29 +44,29 @@
             margin-top: 5px;
             margin-bottom: 10px;
             border-radius: 4px;
-            border: 1px solid var(--border-color);
+            border: 1px solid #ccc;
             transition: border-color 0.3s;
         }
 
         input[type="number"]:focus, select:focus {
-            border-color: var(--primary-color);
-            outline: none;
+            border-color: #4CAF50;
         }
 
         button {
             width: 100%;
             padding: 10px;
-            background-color: var(--primary-color);
+            background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-size: 16px;
-            transition: background-color 0.3s, box-shadow 0.3s;
+            transition: background-color 0.3s;
         }
 
         button:focus {
-            box-shadow: 0 0 5px var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 5px #4CAF50;
         }
 
         button:hover {
@@ -96,11 +84,11 @@
         }
 
         .same {
-            color: var(--success-color);
+            color: #28a745; /* Green */
         }
 
         .not-same {
-            color: var(--error-color);
+            color: #dc3545; /* Red */
         }
 
         /* Slide toggle styles */
@@ -128,11 +116,11 @@
         }
 
         .dark-mode .theme-toggle {
-            background-color: var(--primary-color);
+            background-color: #4CAF50;
         }
 
         .dark-mode .toggle-thumb {
-            left: calc(100% - 17px); /* Slide to the right */
+            left: 23px; /* Slide to the right */
         }
 
         .light-mode {
@@ -153,27 +141,28 @@
         .product-type {
             margin-bottom: 15px;
         }
+
     </style>
 </head>
 <body class="dark-mode">
-    
+
 <div class="container" id="container">
     <h2>Unit Converter & 10% Calculator</h2>
 
     <!-- Dropdown to choose the product type -->
     <div class="product-type">
         <label for="productType">Select Product Type</label>
-        <select id="productType" aria-label="Select product type">
+        <select id="productType">
             <option value="textile">Textile and Bedding</option>
             <option value="other">Other Product</option>
         </select>
     </div>
 
     <label for="temuValue">Temu Side Value</label>
-    <input type="number" id="temuValue" placeholder="Enter value" aria-label="Enter Temu side value">
+    <input type="number" id="temuValue" placeholder="Enter value">
 
     <label for="temuUnit">Temu Side Unit</label>
-    <select id="temuUnit" aria-label="Select Temu side unit">
+    <select id="temuUnit">
         <option value="cm">Centimeters (cm)</option>
         <option value="m">Meters (m)</option>
         <option value="mm">Millimeters (mm)</option>
@@ -183,10 +172,10 @@
     </select>
 
     <label for="rightValue">Right Side Value</label>
-    <input type="number" id="rightValue" placeholder="Enter value" aria-label="Enter right side value">
+    <input type="number" id="rightValue" placeholder="Enter value">
 
     <label for="rightUnit">Right Side Unit</label>
-    <select id="rightUnit" aria-label="Select right side unit">
+    <select id="rightUnit">
         <option value="cm">Centimeters (cm)</option>
         <option value="m">Meters (m)</option>
         <option value="mm">Millimeters (mm)</option>
@@ -195,7 +184,7 @@
         <option value="yd">Yards (yd)</option>
     </select>
 
-    <button id="calculateBtn" tabindex="0" aria-label="Calculate button">Calculate</button>
+    <button id="calculateBtn" tabindex="0">Calculate</button>
 
     <div class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
         <div class="toggle-thumb"></div>
@@ -205,58 +194,95 @@
 </div>
 
 <script>
-document.getElementById('calculateBtn').addEventListener('click', function() {
-    const temuValue = parseFloat(document.getElementById('temuValue').value);
-    const temuUnit = document.getElementById('temuUnit').value;
-    const rightValue = parseFloat(document.getElementById('rightValue').value);
-    const rightUnit = document.getElementById('rightUnit').value;
-    const productType = document.getElementById('productType').value;
-
-    if (isNaN(temuValue) || isNaN(rightValue)) {
-        document.getElementById('result').innerText = "Please enter valid numbers for both sides.";
-        return;
+    // Unit conversion function for various units to cm
+    function convertToCm(value, unit) {
+        const conversionFactors = {
+            'm': 100,
+            'mm': 0.1,
+            'ft': 30.48,
+            'in': 2.54,
+            'yd': 91.44,
+            'cm': 1
+        };
+        return value * conversionFactors[unit];
     }
 
-    const temuCm = convertToCm(temuValue, temuUnit);
-    const rightCm = convertToCm(rightValue, rightUnit);
-
-    let result;
-    if (productType === "textile") {
-        result = textileAndBeddingLogic(temuCm, rightCm);
-    } else if (productType === "other") {
-        result = otherProductLogic(temuCm, rightCm);
-    } else {
-        result = "Invalid product type selected.";
+    // Function for Textile and Bedding logic
+    function textileAndBeddingLogic(temuCm, rightCm) {
+        if (temuCm >= 30) {
+            // Apply ±3 cm logic
+            let upperLimit = temuCm + 3;
+            let lowerLimit = temuCm - 3;
+            return (rightCm <= upperLimit && rightCm >= lowerLimit) ? 'Same' : 'Not Same';
+        } else {
+            // Apply ±10% logic for values below 30 cm
+            let temu10Percent = temuCm * 0.10;
+            let upperLimit = temuCm + temu10Percent;
+            let lowerLimit = temuCm - temu10Percent;
+            return (rightCm <= upperLimit && rightCm >= lowerLimit) ? 'Same' : 'Not Same';
+        }
     }
 
-    const formattedTemuCm = temuCm.toFixed(2);
-    const formattedRightCm = rightCm.toFixed(2);
+    // Function for Other Product logic
+    function otherProductLogic(temuCm, rightCm) {
+        if (temuCm >= 50) {
+            // Apply ±5 cm logic
+            let upperLimit = temuCm + 5;
+            let lowerLimit = temuCm - 5;
+            return (rightCm <= upperLimit && rightCm >= lowerLimit) ? 'Same' : 'Not Same';
+        } else {
+            // Apply ±10% logic for values below 50 cm
+            let temu10Percent = temuCm * 0.10;
+            let upperLimit = temuCm + temu10Percent;
+            let lowerLimit = temuCm - temu10Percent;
+            return (rightCm <= upperLimit && rightCm >= lowerLimit) ? 'Same' : 'Not Same';
+        }
+    }
 
-    document.getElementById('result').innerHTML = `
-        <span class="bold-result ${result === 'Same' ? 'same' : 'not-same'}">Result: ${result}</span> |
-        Temu Side (in cm): ${formattedTemuCm} |
-        Right Side (in cm): ${formattedRightCm}
-    `;
-});
+    // Main function to handle the conversion and comparison
+    document.getElementById('calculateBtn').addEventListener('click', function() {
+        const temuValue = parseFloat(document.getElementById('temuValue').value);
+        const temuUnit = document.getElementById('temuUnit').value;
+        const rightValue = parseFloat(document.getElementById('rightValue').value);
+        const rightUnit = document.getElementById('rightUnit').value;
+        const productType = document.getElementById('productType').value;
 
-function convertToCm(value, unit) {
-    const conversionFactors = {
-        'm': 100,
-        'mm': 0.1,
-        'ft': 30.48,
-        'in': 2.54,
-        'yd': 91.44,
-        'cm': 1
-    };
-    return value * conversionFactors[unit];
-}
+        if (isNaN(temuValue) || isNaN(rightValue)) {
+            document.getElementById('result').innerText = "Please enter valid numbers for both sides.";
+            return;
+        }
 
-function textileAndBeddingLogic(temuCm, rightCm) {
-    if (temuCm >= 30) {
-        let upperLimit = temuCm + 3;
-        let lowerLimit = temuCm - 3;
-        return (rightCm <= upperLimit && rightCm >= lowerLimit) ? 'Same' : 'Not Same';
-    } else {
-        let temu10Percent = temuCm * 0.10;
-        let upperLimit = temuCm + temu10Percent;
-        let lowerLimit = temuCm
+        // Convert both values to cm
+        const temuCm = convertToCm(temuValue, temuUnit);
+        const rightCm = convertToCm(rightValue, rightUnit);
+
+        let result;
+        if (productType === "textile") {
+            result = textileAndBeddingLogic(temuCm, rightCm);
+        } else if (productType === "other") {
+            result = otherProductLogic(temuCm, rightCm);
+        } else {
+            result = "Invalid product type selected.";
+        }
+
+        // Format the result to two decimal places
+        const formattedTemuCm = temuCm.toFixed(2);
+        const formattedRightCm = rightCm.toFixed(2);
+
+        // Display the result with bold styling
+        document.getElementById('result').innerHTML = `
+            <span class="bold-result ${result === 'Same' ? 'same' : 'not-same'}">Result: ${result}</span> |
+            Temu Side (in cm): ${formattedTemuCm} |
+            Right Side (in cm): ${formattedRightCm}
+        `;
+    });
+
+    // Theme toggle function
+    function toggleTheme() {
+        const body = document.body;
+        body.classList.toggle('light-mode');
+        body.classList.toggle('dark-mode');
+    }
+</script>
+</body>
+</html>
