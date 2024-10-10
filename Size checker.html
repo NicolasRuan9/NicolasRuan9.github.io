@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit Converter & 10% Calculator</title>
+    <style>
+        :root {
+            --background-color: #444;
+            --text-color: #fff;
+            --border-color: #ccc;
+            --primary-color: #4CAF50;
+            --success-color: #28a745;
+            --error-color: #dc3545;
+            --container-padding: 20px;
+            --border-radius: 8px;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            background-color: var(--background-color);
+            padding: var(--container-padding);
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        h2 {
+            text-align: center;
+            color: var(--text-color);
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        input[type="number"], select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus, select:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        button:focus {
+            box-shadow: 0 0 5px var(--primary-color);
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .bold-result {
+            font-weight: bold;
+        }
+
+        .same {
+            color: var(--success-color);
+        }
+
+        .not-same {
+            color: var(--error-color);
+        }
+
+        /* Slide toggle styles */
+        .theme-toggle {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+            background-color: #555;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .toggle-thumb {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 14px;
+            height: 14px;
+            background-color: white;
+            border-radius: 50%;
+            transition: left 0.3s;
+        }
+
+        .dark-mode .theme-toggle {
+            background-color: var(--primary-color);
+        }
+
+        .dark-mode .toggle-thumb {
+            left: calc(100% - 17px); /* Slide to the right */
+        }
+
+        .light-mode {
+            background-color: #f5f5f5;
+            color: black;
+        }
+
+        .light-mode .container {
+            background-color: #fff;
+            color: black;
+        }
+
+        .light-mode h2, .light-mode label {
+            color: black;
+        }
+
+        /* Additional styling for better UX */
+        .product-type {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body class="dark-mode">
+    
+<div class="container" id="container">
+    <h2>Unit Converter & 10% Calculator</h2>
+
+    <!-- Dropdown to choose the product type -->
+    <div class="product-type">
+        <label for="productType">Select Product Type</label>
+        <select id="productType" aria-label="Select product type">
+            <option value="textile">Textile and Bedding</option>
+            <option value="other">Other Product</option>
+        </select>
+    </div>
+
+    <label for="temuValue">Temu Side Value</label>
+    <input type="number" id="temuValue" placeholder="Enter value" aria-label="Enter Temu side value">
+
+    <label for="temuUnit">Temu Side Unit</label>
+    <select id="temuUnit" aria-label="Select Temu side unit">
+        <option value="cm">Centimeters (cm)</option>
+        <option value="m">Meters (m)</option>
+        <option value="mm">Millimeters (mm)</option>
+        <option value="ft">Feet (ft)</option>
+        <option value="in">Inches (in)</option>
+        <option value="yd">Yards (yd)</option>
+    </select>
+
+    <label for="rightValue">Right Side Value</label>
+    <input type="number" id="rightValue" placeholder="Enter value" aria-label="Enter right side value">
+
+    <label for="rightUnit">Right Side Unit</label>
+    <select id="rightUnit" aria-label="Select right side unit">
+        <option value="cm">Centimeters (cm)</option>
+        <option value="m">Meters (m)</option>
+        <option value="mm">Millimeters (mm)</option>
+        <option value="ft">Feet (ft)</option>
+        <option value="in">Inches (in)</option>
+        <option value="yd">Yards (yd)</option>
+    </select>
+
+    <button id="calculateBtn" tabindex="0" aria-label="Calculate button">Calculate</button>
+
+    <div class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
+        <div class="toggle-thumb"></div>
+    </div>
+
+    <div class="result" id="result"></div>
+</div>
+
+<script>
+document.getElementById('calculateBtn').addEventListener('click', function() {
+    const temuValue = parseFloat(document.getElementById('temuValue').value);
+    const temuUnit = document.getElementById('temuUnit').value;
+    const rightValue = parseFloat(document.getElementById('rightValue').value);
+    const rightUnit = document.getElementById('rightUnit').value;
+    const productType = document.getElementById('productType').value;
+
+    if (isNaN(temuValue) || isNaN(rightValue)) {
+        document.getElementById('result').innerText = "Please enter valid numbers for both sides.";
+        return;
+    }
+
+    const temuCm = convertToCm(temuValue, temuUnit);
+    const rightCm = convertToCm(rightValue, rightUnit);
+
+    let result;
+    if (productType === "textile") {
+        result = textileAndBeddingLogic(temuCm, rightCm);
+    } else if (productType === "other") {
+        result = otherProductLogic(temuCm, rightCm);
+    } else {
+        result = "Invalid product type selected.";
+    }
+
+    const formattedTemuCm = temuCm.toFixed(2);
+    const formattedRightCm = rightCm.toFixed(2);
+
+    document.getElementById('result').innerHTML = `
+        <span class="bold-result ${result === 'Same' ? 'same' : 'not-same'}">Result: ${result}</span> |
+        Temu Side (in cm): ${formattedTemuCm} |
+        Right Side (in cm): ${formattedRightCm}
+    `;
+});
+
+function convertToCm(value, unit) {
+    const conversionFactors = {
+        'm': 100,
+        'mm': 0.1,
+        'ft': 30.48,
+        'in': 2.54,
+        'yd': 91.44,
+        'cm': 1
+    };
+    return value * conversionFactors[unit];
+}
+
+function textileAndBeddingLogic(temuCm, rightCm) {
+    if (temuCm >= 30) {
+        let upperLimit = temuCm + 3;
+        let lowerLimit = temuCm - 3;
+        return (rightCm <= upperLimit && rightCm >= lowerLimit) ? 'Same' : 'Not Same';
+    } else {
+        let temu10Percent = temuCm * 0.10;
+        let upperLimit = temuCm + temu10Percent;
+        let lowerLimit = temuCm
